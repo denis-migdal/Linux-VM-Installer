@@ -17,10 +17,8 @@ Créée une nouvelle machine virtuelle :
 
 Variables d'environnement:
 
-----
 |Nom|Valeur par défaut|Description|
-----
+|--|--|--|
 |VM_RAM|4096||
 |VM_DISK|8192||
 |VM_NB_CPU|4||
-----
