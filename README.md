@@ -8,7 +8,7 @@
 
 ### VirtualBox
 
-#### Create
+#### create
 
 Créée une nouvelle machine virtuelle :
 ```bash
@@ -16,6 +16,7 @@ Créée une nouvelle machine virtuelle :
 ```
 
 Variables d'environnement:
+
 ----
 |Nom|Valeur par défaut|Description|
 ----
