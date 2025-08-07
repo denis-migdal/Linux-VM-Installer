@@ -37,15 +37,12 @@ Variables d'environnement:
 |USER|Zeus||
 |LOGIN|zeus||
 |PWD|1234||
-|--|--|--|
 |HOSTNAME|LVMI||
 |DOMAIN|$HOSTNAME.localhost||
-|--|--|--|
 |LOCALE|fr_FR||
 |KEYBOARD|fr||
 |COUNTRY|FR||
 |TZ|Europe/Paris||
-|--|--|--|
 |MIRROR|mirror.dsi.uca.fr||
 |MIRROR_DIR|/debian/debian/||
 |PROXY|$http_proxy||
