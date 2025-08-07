@@ -4,9 +4,7 @@ set -x
 
 DECL () {
   if [ ! -v $1 ] ; then
-    echo "decl $1"
     declare -g $1="$2"
-    echo "$C"
   fi
 }
 
