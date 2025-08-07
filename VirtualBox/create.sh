@@ -2,9 +2,17 @@
 
 set -x
 
-VM_RAM="4096"
-VM_DISK="8192"
-VM_NB_CPU=4
+DECL () {
+  if [ ! -v $1 ] ; then
+    echo "decl $1"
+    declare -g $1="$2"
+    echo "$C"
+  fi
+}
+
+DECL VM_RAM    "4096"
+DECL VM_DISK   "8192"
+DECL VM_NB_CPU "8192"
 
 VM_NAME="$1"
 VM_DIR="$2"
