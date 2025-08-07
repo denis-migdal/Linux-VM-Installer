@@ -1,0 +1,11 @@
+[Unit]
+Description=VMReady
+After=sshd.target
+
+[Service]
+Type=simple
+User=root
+ExecStart=/usr/bin/VBoxControl guestproperty set VMReady true
+
+[Install]
+WantedBy=multi-user.target

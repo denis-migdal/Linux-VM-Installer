@@ -6,21 +6,20 @@ DECL () {
   fi
 }
 
-DECL USER  "Zeus"
-DECL LOGIN "zeus"
-DECL PWD   "1234"
+DECL VM_USER  "Zeus"
+DECL VM_LOGIN "zeus"
+DECL VM_PWD   "1234"
 #
-DECL HOSTNAME "LVMI"
-DECL DOMAIN   "$HOSTNAME.localhost"
+DECL VM_HOSTNAME "LVMI"
+DECL VM_DOMAIN   "$VM_HOSTNAME.localhost"
 #
-DECL LOCALE   "fr_FR"
-DECL KEYBOARD "fr"
-DECL COUNTRY  "FR"
-DECL TZ       "Europe/Paris"
+DECL VM_LOCALE   "fr_FR"
+DECL VM_KEYBOARD "fr"
+DECL VM_TZ       "Europe/Paris"
 #
-MIRROR="mirror.dsi.uca.fr"
-MIRROR_DIR="/debian/debian/"
-PROXY="$http_proxy"
+DECL VM_MIRROR     "mirror.dsi.uca.fr"
+DECL VM_MIRROR_DIR "/debian/debian/"
+DECL VM_PROXY      "$http_proxy"
 
 # Generate file
 
@@ -28,30 +27,40 @@ d-i() { echo d_i $@ ; }
 keyboard-configuration() { echo keyboard-configuration $@ ; }
 taskel() { echo taskel $@ ; }
 
+# Locale
+d-i debian-installer/locale string "$VM_LOCALE"
+
+d-i console-setup/ask_detect boolean false
+d-i console-setup/layoutcode string "$VM_KEYBOARD"
+d-i keyboard-configuration/xkb-keymap select "$VM_KEYBOARD(latin9)"
+d-i keyboard-configuration/layoutcode string "$VM_KEYBOARD"
+keyboard-configuration	keyboard-configuration/layoutcode	string	"$VM_KEYBOARD"
+
 ### Partitioning
 d-i partman-auto/disk string /dev/sda
 d-i partman-auto/method string regular
 d-i partman-lvm/device_remove_lvm boolean true
 d-i partman-md/device_remove_md boolean true
-d-i partman-auto/choose_recipe select atomic
+d-i partman-basicfilesystems/no_swap boolean false
+#d-i partman-auto/choose_recipe select atomic
+d-i partman-auto/expert_recipe string noswap :: \
+    1 1 1 free \
+        \$iflabel{ gpt } \
+        \$reusemethod{ } \
+        method{ biosgrub } . \
+    1000 8850 -1 \$default_filesystem \
+        \$lvmok{ } \
+        method{ format } \
+        format{ } \
+        use_filesystem{ } \
+        \$default_filesystem{ } \
+        mountpoint{ / } . \
 
-# This makes partman automatically partition without confirmation
-d-i partman-partitioning/confirm_write_new_label boolean true
-d-i partman/choose_partition select finish
-d-i partman/confirm boolean true
-d-i partman/confirm_nooverwrite boolean true
-
-# Locale
-d-i debian-installer/locale string "$LOCALE"
-d-i console-setup/ask_detect boolean false
-d-i console-setup/layoutcode string "$KEYBOARD"
-d-i keyboard-configuration/xkb-keymap select "$KEYBOARD(latin9)"
-d-i keyboard-configuration/layoutcode string "$KEYBOARD"
-keyboard-configuration	keyboard-configuration/layoutcode	string	"$KEYBOARD"
+d-i partman-auto/choose_recipe select noswap
 
 # Network
-d-i netcfg/get_hostname string "$HOSTNAME"
-d-i netcfg/get_domain string "$DOMAIN"
+d-i netcfg/get_hostname string "$VM_HOSTNAME"
+d-i netcfg/get_domain string "$VM_DOMAIN"
 
 d-i netcfg/choose_interface select auto
 d-i netcfg/link_wait_timeout string 10
@@ -70,7 +79,7 @@ d-i clock-setup/utc boolean false
 @@VBOX_COND_END@@
 EOF
 
-d-i time/zone string "$TZ"
+d-i time/zone string "$VM_TZ"
 
 #IF VBOX
 echo "@@VBOX_COND_IS_INSTALLING_ADDITIONS@@d-i clock-setup/ntp boolean false@@VBOX_COND_END@@"
@@ -83,16 +92,18 @@ d-i base-installer/kernel/override-image string linux-image-amd64
 d-i mirror/protocol string http
 d-i mirror/country string manual
 d-i mirror/http/country string manual
-d-i mirror/mirror select "$MIRROR"
-d-i mirror/http/mirror select "$MIRROR"
-d-i mirror/hostname string "$MIRROR"
-d-i mirror/http/hostname string "$MIRROR"
-d-i mirror/directory string "$MIRROR_DIR"
-d-i mirror/http/directory string "$MIRROR_DIR"
-d-i mirror/proxy string "$PROXY"
-d-i mirror/http/proxy string "$PROXY"
+d-i mirror/mirror select "$VM_MIRROR"
+d-i mirror/http/mirror select "$VM_MIRROR"
+d-i mirror/hostname string "$VM_MIRROR"
+d-i mirror/http/hostname string "$VM_MIRROR"
+d-i mirror/directory string "$VM_MIRROR_DIR"
+d-i mirror/http/directory string "$VM_MIRROR_DIR"
+d-i mirror/proxy string "$VM_PROXY"
+d-i mirror/http/proxy string "$VM_PROXY"
 
 d-i mirror/suite string bookworm
+
+# X
 
 d-i apt-setup/disable-cdrom-entries boolean true
 d-i apt-setup/use_mirror boolean true
@@ -107,15 +118,22 @@ d-i pkgsel/include string openssh-server
 d-i pkgsel/upgrade select none
 
 # Users
-d-i passwd/user-fullname string "$USER"
-d-i passwd/username string "$LOGIN"
-d-i passwd/user-password password "$PWD"
-d-i passwd/user-password-again password "$PWD"
 d-i passwd/root-login boolean true
-d-i passwd/root-password password "$PWD"
-d-i passwd/root-password-again password "$PWD"
+d-i passwd/root-password password "$VM_PWD"
+d-i passwd/root-password-again password "$VM_PWD"
+d-i passwd/user-fullname string "$VM_USER"
+d-i passwd/username string "$VM_LOGIN"
+d-i passwd/user-password password "$VM_PWD"
+d-i passwd/user-password-again password "$VM_PWD"
 d-i user-setup/allow-password-weak boolean true
 d-i passwd/user-default-groups string admin
+
+# This makes partman automatically partition without confirmation
+d-i partman-partitioning/default_label string gpt
+d-i partman-partitioning/confirm_write_new_label boolean true
+d-i partman/choose_partition select finish
+d-i partman/confirm boolean true
+d-i partman/confirm_nooverwrite boolean true
 
 # Grub
 d-i grub-installer/grub2_instead_of_grub_legacy boolean true

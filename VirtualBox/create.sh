@@ -8,7 +8,7 @@ DECL () {
 
 DECL VM_RAM    "4096"
 DECL VM_DISK   "8192"
-DECL VM_NB_CPU "8192"
+DECL VM_NB_CPU "4"
 
 VM_NAME="$1"
 VM_DIR="$2"
@@ -42,7 +42,8 @@ VBoxManage modifyvm "$VM_NAME" --natpf1 "guestssh,tcp,127.0.1.1,8022,,22"
 ## Dynamically allocated by default (--variant=Standard)
 VBoxManage createmedium disk --format VDI --size "$VM_DISK" --filename "$VM_DISK_PATH"
 
-VBoxManage storagectl "$VM_NAME" --name "SATA Controller" --add sata --controller IntelAhci       
+# Too much ports makes Linux boot longer.
+VBoxManage storagectl "$VM_NAME" --name "SATA Controller" --add sata --controller IntelAhci --portcount 5
 VBoxManage storageattach "$VM_NAME" --storagectl "SATA Controller" --port 0 --device 0 --type hdd --medium "$VM_DISK_PATH"
 
 # DVD (for .iso)
