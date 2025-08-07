@@ -1,7 +1,5 @@
 #!/usr/bin/bash
 
-set -x
-
 DECL () {
   if [ ! -v $1 ] ; then
     declare -g $1="$2"
