@@ -85,6 +85,3 @@ Variables d'environnement:
 Note : Alt+F4 pour visualiser les logs pendant l'installation (Alt+F1 pour revenir à l'interface graphique).
 
 TODO: post install commands...
-TODO: GRUB - remove 5 sec waiting
-TODO: VM create : opti waiting port SATA
-TODO: remove swap
