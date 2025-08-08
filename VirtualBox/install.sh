@@ -55,10 +55,20 @@ POST_INSTALL=$(cat <<- CEOF
     
     cp /target/opt/VBoxGuestAdditions-*/bin/VBoxControl /target/opt/VBoxGuestAdditions-*/bin/VBoxClient
 
+    sed -i 's#GRUB_TIMEOUT=5#GRUB_TIMEOUT=0#' /target/etc/default/grub
+    echo "GRUB_TIMEOUT_STYLE=hidden" >> /target/etc/default/grub
+
+    in-target update-grub
+
+    sed -i 's#timeout=5#timeout=0#g' /target/boot/grub/grub.cfg
+    sed -i 's#timeout_style=menu#timeout_style=hidden#g' /target/boot/grub/grub.cfg
+
     echo 'http_proxy="$http_proxy"' >> /target/etc/environment
     echo 'https_proxy="$https_proxy"' >> /target/etc/environment
 CEOF
 )
+
+# dunno why we need to manually edit /boot/grub/grub.cfg
 
 # cp Ctrl -> Client due to bug :
 # https://forums.virtualbox.org/viewtopic.php?p=533624#p533624
@@ -88,9 +98,5 @@ if [ -v tmp_addon ] ; then
     rm "$tmp_addon"
 fi
 
-echo "==== DONE ===="
-
 # Brut... (can't detach non-headless)
 VBoxManage controlvm "$VM_NAME" poweroff
-
-echo "==== DONE2 ===="

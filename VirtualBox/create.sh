@@ -37,6 +37,10 @@ VBoxManage modifyvm "$VM_NAME" --nic1 nat
 # Redirections de ports
 VBoxManage modifyvm "$VM_NAME" --natpf1 "guestssh,tcp,127.0.1.1,8022,,22"
 
+# Boot
+
+VBoxManage modifyvm "$VM_NAME" --biosbootmenu disabled --bioslogodisplaytime 1
+
 # Disque
 
 ## Dynamically allocated by default (--variant=Standard)
