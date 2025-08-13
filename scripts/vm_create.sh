@@ -10,6 +10,8 @@ DECL VM_RAM    "4096"
 DECL VM_DISK   "8192"
 DECL VM_NB_CPU "4"
 
+DECL VM_SSH_PORT 8022
+
 VM_NAME="$1"
 VM_DIR="$2"
 VM_DISK_PATH="$VM_DIR/$VM_NAME/${VM_NAME}_DISK.vdi"
@@ -35,7 +37,7 @@ VBoxManage modifyvm "$VM_NAME" --memory "$VM_RAM"
 
 VBoxManage modifyvm "$VM_NAME" --nic1 nat
 # Redirections de ports
-VBoxManage modifyvm "$VM_NAME" --natpf1 "guestssh,tcp,127.0.1.1,8022,,22"
+VBoxManage modifyvm "$VM_NAME" --natpf1 "guestssh,tcp,127.0.0.1,$VM_SSH_PORT,,22"
 
 # Boot
 

@@ -46,10 +46,14 @@ fi
 
 # Install Debian
 DIR=$(dirname $(readlink -f $0))
-VMREADY_SERVICE=$(cat "$DIR"/vmready.service)
 
-# TODO: grub...
+VMREADY_SERVICE=$(cat "$DIR"/../assets/vmready.service)
+VM_SSH_PUBKEY=$(cat "$DIR"/../assets/keys/LVMI.pub)
+
 POST_INSTALL=$(cat <<- CEOF
+
+    echo "$VM_SSH_PUBKEY" >> /target/home/zeus/.ssh/authorized_keys
+    
     echo "$VMREADY_SERVICE" > /target/etc/systemd/system/VMReady.service
     ln -s /etc/systemd/system/VMReady.service /target/etc/systemd/system/multi-user.target.wants/VMReady.service
     

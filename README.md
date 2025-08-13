@@ -14,19 +14,38 @@ export VM_ADDON=/tmp/addon.iso
 wget -O "$VM_ISO" https://cdimage.debian.org/debian-cd/current/amd64/iso-dvd/debian-12.11.0-amd64-DVD-1.iso
 wget -O "$VM_ADDON" https://download.virtualbox.org/virtualbox/7.0.0_BETA3/VBoxGuestAdditions_7.0.0_BETA3.iso
 
-./VirtualBox/create.sh TEST ~/Data/TEST
-./VirtualBox/preseed.sh | ./VirtualBox/install.sh TEST -
+# create & install VM
+./scripts/vm_create.sh TEST ~/Data/TEST
+./scripts/preseed.sh | ./scripts/vm_install.sh TEST -
+
+# SSH
+./scripts/install_ssh.sh TEST
+
+# launcher
+./scripts/launcher.sh TEST
+./scripts/install_desktop.sh TEST
+
+# import/export
+./scripts/vm_export.sh TEST ~/Data/TESTC.ova
+./scripts/vm_import.sh ~/Data/TESTC.ova TESTC
 ```
 
 ## Scripts
 
-### VirtualBox
+- vm_create : créée la VM
+- preseed : crée le fichier de configuration de l'installation.
+- vm_install : install Linux sur la VM
+- install_ssh
+- vm_export
+- vm_import
+- launcher : démarre la VM dans un terminal
+- install_desktop : créée un fichier .desktop
 
-#### create
+### vm_create
 
 Créée une nouvelle machine virtuelle :
 ```bash
-./VirtualBox/create.sh $VM_NAME $VM_DIR
+./scripts/vm_create.sh $VM_NAME $VM_DIR
 ```
 
 Variables d'environnement:
@@ -36,12 +55,13 @@ Variables d'environnement:
 |VM_RAM|4096||
 |VM_DISK|8192||
 |VM_NB_CPU|4||
+|VM_SSH_PORT|8022||
 
-#### preseed
+### preseed
 
 Génère la configuraton preseed :
 ```bash
-./VirtualBox/preseed.sh > $PRESEED_FILE
+./scripts/preseed.sh > $PRESEED_FILE
 ```
 
 Variables d'environnement:
@@ -64,13 +84,13 @@ Exemple de configuration ici : https://www.debian.org/releases/stable/example-pr
 
 TODO: VM_EXTRA_PACKAGES.
 
-#### install
+### vm_install
 
 Installe une nouvelle machine virtuelle :
 ```bash
-./VirtualBox/install.sh $VM_NAME $PRESEED_FILE
+./scripts/vm_install.sh $VM_NAME $PRESEED_FILE
 # or
-./VirtualBox/preseed.sh | ./VirtualBox/install.sh $VM_NAME -
+./scripts/preseed.sh | ./scripts/vm_install.sh $VM_NAME -
 ```
 
 Variables d'environnement:
@@ -85,3 +105,42 @@ Variables d'environnement:
 Note : Alt+F4 pour visualiser les logs pendant l'installation (Alt+F1 pour revenir à l'interface graphique).
 
 TODO: post install commands...
+
+### ssh_install
+
+```bash
+./scripts/ssh_install.sh $VM_NAME
+```
+
+
+### vm_import/export
+
+```bash
+./scripts/vm_export.sh $VM_NAME $VM_OVA
+./scripts/vm_import.sh $VM_OVA $VM_DIR
+```
+
+### launcher
+
+Démarre la machine virtuelle et ouvre une session SSH :
+```bash
+./scripts/launcher.sh $VM_NAME
+```
+
+|Nom|Valeur par défaut|Description|
+|--|--|--|
+|VM_USER|zeus||
+|VM_SSH_PORT|8022||
+|VM_IP|127.0.0.1||
+
+
+### install_desktop
+
+Créée un fichier .desktop :
+```bash
+./scripts/install_desktop.sh $VM_NAME
+```
+
+|Nom|Valeur par défaut|Description|
+|--|--|--|
+|VM_ICON|./assets/LVMI.svg||
