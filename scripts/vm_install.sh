@@ -31,7 +31,9 @@ if [ ! -v "VM_ADDON" ] ; then
 
     tmp_addon=$(mktemp /tmp/addon.XXXXXX.iso)
 
-    wget -O "$tmp_addon" https://download.virtualbox.org/virtualbox/7.0.0_BETA3/VBoxGuestAdditions_7.0.0_BETA3.iso
+    version=$(vboxmanage --version | cut -dr -f1)
+
+    wget -O "$tmp_addon" https://download.virtualbox.org/virtualbox/$version/VBoxGuestAdditions_$version.iso
     
     VM_ADDON="$tmp_addon"
 fi
@@ -57,8 +59,6 @@ POST_INSTALL=$(cat <<- CEOF
     echo "$VMREADY_SERVICE" > /target/etc/systemd/system/VMReady.service
     ln -s /etc/systemd/system/VMReady.service /target/etc/systemd/system/multi-user.target.wants/VMReady.service
     
-    cp /target/opt/VBoxGuestAdditions-*/bin/VBoxControl /target/opt/VBoxGuestAdditions-*/bin/VBoxClient
-
     sed -i 's#GRUB_TIMEOUT=5#GRUB_TIMEOUT=0#' /target/etc/default/grub
     echo "GRUB_TIMEOUT_STYLE=hidden" >> /target/etc/default/grub
 
@@ -76,6 +76,7 @@ CEOF
 
 # cp Ctrl -> Client due to bug :
 # https://forums.virtualbox.org/viewtopic.php?p=533624#p533624
+#cp /target/opt/VBoxGuestAdditions-*/bin/VBoxControl /target/opt/VBoxGuestAdditions-*/bin/VBoxClient
 
 VBoxManage unattended install "$VM_NAME" \
     --iso "$VM_ISO" \

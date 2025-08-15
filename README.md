@@ -1,5 +1,8 @@
 # Linux VM Installer
 
+https://www.virtualbox.org/wiki/Download_Old_Builds_7_0
+https://download.virtualbox.org/virtualbox/
+
 ## Usage
 
 - ...
@@ -11,8 +14,11 @@ export VM_DEBUG=true
 export VM_ISO=/tmp/debian.iso
 export VM_ADDON=/tmp/addon.iso
 
-wget -O "$VM_ISO" https://cdimage.debian.org/debian-cd/current/amd64/iso-dvd/debian-12.11.0-amd64-DVD-1.iso
-wget -O "$VM_ADDON" https://download.virtualbox.org/virtualbox/7.0.0_BETA3/VBoxGuestAdditions_7.0.0_BETA3.iso
+VBOX_VERSION=$(vboxmanage --version | cut -dr -f1)
+OS_VERSION="12.11.0"
+
+wget -O "$VM_ISO" https://cdimage.debian.org/mirror/cdimage/archive/$OS_VERSION/amd64/iso-dvd/debian-$OS_VERSION-amd64-DVD-1.iso
+wget -O "$VM_ADDON" https://download.virtualbox.org/virtualbox/$VBOX_VERSION/VBoxGuestAdditions_$VBOX_VERSION.iso
 
 # create & install VM
 ./scripts/vm_create.sh TEST ~/Data/TEST
