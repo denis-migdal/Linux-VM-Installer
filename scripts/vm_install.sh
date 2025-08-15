@@ -27,16 +27,16 @@ if [ ! -v "VM_ISO" ] ; then
     
     VM_ISO="$tmp_iso"
 fi
-if [ ! -v "VM_ADDON" ] ; then
-
-    tmp_addon=$(mktemp /tmp/addon.XXXXXX.iso)
-
-    version=$(vboxmanage --version | cut -dr -f1)
-
-    wget -O "$tmp_addon" https://download.virtualbox.org/virtualbox/$version/VBoxGuestAdditions_$version.iso
-    
-    VM_ADDON="$tmp_addon"
-fi
+#if [ ! -v "VM_ADDON" ] ; then
+#
+#    tmp_addon=$(mktemp /tmp/addon.XXXXXX.iso)
+# 
+#    version=$(vboxmanage --version | cut -dr -f1)
+#
+#    wget -O "$tmp_addon" https://download.virtualbox.org/virtualbox/$version/VBoxGuestAdditions_$version.iso
+#    
+#    VM_ADDON="$tmp_addon"
+#fi
 
 EXTRA_KERNEL_PARAMETERS="auto=true preseed/file=/cdrom/preseed.cfg priority=critical quiet splash noprompt noshell automatic-ubiquity --"
 
@@ -74,17 +74,14 @@ CEOF
 
 # dunno why we need to manually edit /boot/grub/grub.cfg
 
-# cp Ctrl -> Client due to bug :
-# https://forums.virtualbox.org/viewtopic.php?p=533624#p533624
-#cp /target/opt/VBoxGuestAdditions-*/bin/VBoxControl /target/opt/VBoxGuestAdditions-*/bin/VBoxClient
-
 VBoxManage unattended install "$VM_NAME" \
     --iso "$VM_ISO" \
-    --install-additions --additions-iso="$VM_ADDON" \
+    --install-additions \
     --script-template="$VM_PRESEED" \
     --post-install-command="/target/bin/bash -c '$POST_INSTALL'" \
     --extra-install-kernel-parameters="$EXTRA_KERNEL_PARAMETERS" \
     --user "$VM_LOGIN"
+# --additions-iso="$VM_ADDON" \
 
 # Start VM for install
 VBoxManage startvm "$VM_NAME" $HEADLESS
@@ -99,9 +96,9 @@ fi
 if [ -v tmp_iso ] ; then
     rm "$tmp_iso"
 fi
-if [ -v tmp_addon ] ; then
-    rm "$tmp_addon"
-fi
+#if [ -v tmp_addon ] ; then
+#    rm "$tmp_addon"
+#fi
 
 # Brut... (can't detach non-headless)
 VBoxManage controlvm "$VM_NAME" poweroff

@@ -12,13 +12,8 @@ https://download.virtualbox.org/virtualbox/
 ```bash
 export VM_DEBUG=true
 export VM_ISO=/tmp/debian.iso
-export VM_ADDON=/tmp/addon.iso
-
-VBOX_VERSION=$(vboxmanage --version | cut -dr -f1)
-OS_VERSION="12.11.0"
 
 wget -O "$VM_ISO" https://cdimage.debian.org/mirror/cdimage/archive/$OS_VERSION/amd64/iso-dvd/debian-$OS_VERSION-amd64-DVD-1.iso
-wget -O "$VM_ADDON" https://download.virtualbox.org/virtualbox/$VBOX_VERSION/VBoxGuestAdditions_$VBOX_VERSION.iso
 
 # create & install VM
 ./scripts/vm_create.sh TEST ~/Data/TEST
@@ -105,7 +100,6 @@ Variables d'environnement:
 |--|--|--|
 |VM_DEBUG|false|si true, permet de visualiser les logs pendant l'installation.|
 |VM_ISO||si non fourni, télécharge l'iso.|
-|VM_ADDON||si non fourni, télécharge l'iso.|
 |VM_LOGIN|zeus|required for addon installation|
 
 Note : Alt+F4 pour visualiser les logs pendant l'installation (Alt+F1 pour revenir à l'interface graphique).
