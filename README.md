@@ -15,14 +15,16 @@ https://download.virtualbox.org/virtualbox/
 
 
 ```bash
-export VM_DEBUG=true
-export VM_ISO=/tmp/debian.iso
-
 OS_VERSION="12.11.0"
+VM_ISO_ORIG=/tmp/debian.iso
 
-wget -O "$VM_ISO" https://cdimage.debian.org/mirror/cdimage/archive/$OS_VERSION/amd64/iso-dvd/debian-$OS_VERSION-amd64-DVD-1.iso
+wget -O "$VM_ISO_ORIG" https://cdimage.debian.org/mirror/cdimage/archive/$OS_VERSION/amd64/iso-dvd/debian-$OS_VERSION-amd64-DVD-1.iso
+
+export VM_DEBUG=true
+export VM_ISO=/tmp/debian-patched.iso
 
 # create & install VM
+./asl_patchiso.sh "$VM_ISO_ORIG" "$VM_ISO"
 ./asl_create.sh
 ```
 
@@ -30,11 +32,14 @@ wget -O "$VM_ISO" https://cdimage.debian.org/mirror/cdimage/archive/$OS_VERSION/
 
 ```bash
 export VM_DEBUG=true
-export VM_ISO=/tmp/debian.iso
+export VM_ISO_ORIG=/tmp/debian.iso
+export VM_ISO=/tmp/debian-patched.iso
 
 OS_VERSION="12.11.0"
 
-wget -O "$VM_ISO" https://cdimage.debian.org/mirror/cdimage/archive/$OS_VERSION/amd64/iso-dvd/debian-$OS_VERSION-amd64-DVD-1.iso
+wget -O "$VM_ISO_ORIG" https://cdimage.debian.org/mirror/cdimage/archive/$OS_VERSION/amd64/iso-dvd/debian-$OS_VERSION-amd64-DVD-1.iso
+
+./scripts/postinstall.sh | ./scripts/patch_iso.sh "$VM_ISO_ORIG" "$VM_ISO"
 
 # create & install VM
 ./scripts/vm_create.sh TEST ~/Data/TEST
@@ -55,6 +60,7 @@ wget -O "$VM_ISO" https://cdimage.debian.org/mirror/cdimage/archive/$OS_VERSION/
 ## Scripts
 
 - vm_create : créée la VM
+- patch_iso : ajoute le script de post installation à l'iso.
 - preseed : crée le fichier de configuration de l'installation.
 - vm_install : install Linux sur la VM
 - install_ssh
@@ -78,6 +84,13 @@ Variables d'environnement:
 |VM_DISK|8192||
 |VM_NB_CPU|4||
 |VM_SSH_PORT|8022||
+
+### patch_iso
+
+Ajoute le script de post installation à l'iso :
+```bash
+$CMD | ./scripts/patch_iso.sh $SRC_ISO $DST_ISO 
+```
 
 ### preseed
 

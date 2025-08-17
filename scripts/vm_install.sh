@@ -9,7 +9,6 @@ DECL () {
 }
 
 DECL VM_LOGIN zeus
-DECL VM_POSTINSTALL ""
 
 # Preseed (read from input if not given)
 if [[ $2 == "-" ]] ; then
@@ -29,17 +28,8 @@ if [ ! -v "VM_ISO" ] ; then
 
     wget -O "$VM_ISO" https://cdimage.debian.org/mirror/cdimage/archive/$OS_VERSION/amd64/iso-dvd/debian-$OS_VERSION-amd64-DVD-1.iso
     
+    #TODO: need to patch it...
 fi
-#if [ ! -v "VM_ADDON" ] ; then
-#
-#    tmp_addon=$(mktemp /tmp/addon.XXXXXX.iso)
-# 
-#    version=$(vboxmanage --version | cut -dr -f1)
-#
-#    wget -O "$tmp_addon" https://download.virtualbox.org/virtualbox/$version/VBoxGuestAdditions_$version.iso
-#    
-#    VM_ADDON="$tmp_addon"
-#fi
 
 EXTRA_KERNEL_PARAMETERS="auto=true preseed/file=/cdrom/preseed.cfg priority=critical quiet splash noprompt noshell automatic-ubiquity --"
 
@@ -49,48 +39,13 @@ else
     HEADLESS="--type headless"
 fi
 
-# Install Debian
-DIR=$(dirname $(readlink -f $0))
-
-VMREADY_SERVICE=$(cat "$DIR"/../assets/vmready.service)
-VM_SSH_PUBKEY=$(cat "$DIR"/../assets/keys/LVMI.pub)
-
-POST_INSTALL=$(cat <<- CEOF
-
-    ls /target/
-    mkdir /target/home/$VM_LOGIN/.ssh
-    echo "$VM_SSH_PUBKEY" >> /target/home/$VM_LOGIN/.ssh/authorized_keys
-    
-    echo "$VMREADY_SERVICE" > /target/etc/systemd/system/VMReady.service
-    ln -s /etc/systemd/system/VMReady.service /target/etc/systemd/system/multi-user.target.wants/VMReady.service
-    
-    sed -i 's#GRUB_TIMEOUT=5#GRUB_TIMEOUT=0#' /target/etc/default/grub
-    echo "GRUB_TIMEOUT_STYLE=hidden" >> /target/etc/default/grub
-
-    in-target update-grub
-
-    sed -i 's#timeout=5#timeout=0#g' /target/boot/grub/grub.cfg
-    sed -i 's#timeout_style=menu#timeout_style=hidden#g' /target/boot/grub/grub.cfg
-
-    echo 'http_proxy="$http_proxy"' >> /target/etc/environment
-    echo 'https_proxy="$https_proxy"' >> /target/etc/environment
-
-    $VM_POSTINSTALL
-CEOF
-)
-
-echo $POST_INSTALL
-
-# dunno why we need to manually edit /boot/grub/grub.cfg
-
 VBoxManage unattended install "$VM_NAME" \
     --iso "$VM_ISO" \
     --install-additions \
     --script-template="$VM_PRESEED" \
-    --post-install-command="/target/bin/bash -c '$POST_INSTALL'" \
+    --post-install-command="/target/bin/bash /cdrom/install/postinstall.sh" \
     --extra-install-kernel-parameters="$EXTRA_KERNEL_PARAMETERS" \
     --user "$VM_LOGIN"
-# --additions-iso="$VM_ADDON" \
 
 # Start VM for install
 VBoxManage startvm "$VM_NAME" $HEADLESS
@@ -105,9 +60,6 @@ fi
 if [ -v tmp_iso ] ; then
     rm "$tmp_iso"
 fi
-#if [ -v tmp_addon ] ; then
-#    rm "$tmp_addon"
-#fi
 
 # Brut... (can't detach non-headless)
 VBoxManage controlvm "$VM_NAME" poweroff
