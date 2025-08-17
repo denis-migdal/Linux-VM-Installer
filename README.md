@@ -7,11 +7,32 @@ https://download.virtualbox.org/virtualbox/
 
 - ...
 
+### TODO
+
+- move postinstall to a file...
+
+### ASL
+
+
+```bash
+export VM_DEBUG=true
+export VM_ISO=/tmp/debian.iso
+
+OS_VERSION="12.11.0"
+
+wget -O "$VM_ISO" https://cdimage.debian.org/mirror/cdimage/archive/$OS_VERSION/amd64/iso-dvd/debian-$OS_VERSION-amd64-DVD-1.iso
+
+# create & install VM
+./asl_create.sh
+```
+
 ### Test
 
 ```bash
 export VM_DEBUG=true
 export VM_ISO=/tmp/debian.iso
+
+OS_VERSION="12.11.0"
 
 wget -O "$VM_ISO" https://cdimage.debian.org/mirror/cdimage/archive/$OS_VERSION/amd64/iso-dvd/debian-$OS_VERSION-amd64-DVD-1.iso
 
@@ -80,10 +101,10 @@ Variables d'environnement:
 |VM_MIRROR|mirror.dsi.uca.fr||
 |VM_MIRROR_DIR|/debian/debian/||
 |VM_PROXY|$http_proxy||
+|VM_EXTRA_PACKAGES|openssh-server||
+
 
 Exemple de configuration ici : https://www.debian.org/releases/stable/example-preseed.txt
-
-TODO: VM_EXTRA_PACKAGES.
 
 ### vm_install
 
@@ -101,10 +122,9 @@ Variables d'environnement:
 |VM_DEBUG|false|si true, permet de visualiser les logs pendant l'installation.|
 |VM_ISO||si non fourni, télécharge l'iso.|
 |VM_LOGIN|zeus|required for addon installation|
+|VM_POSTINSTALL|||
 
 Note : Alt+F4 pour visualiser les logs pendant l'installation (Alt+F1 pour revenir à l'interface graphique).
-
-TODO: post install commands...
 
 ### ssh_install
 

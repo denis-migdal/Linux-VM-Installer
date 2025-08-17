@@ -20,6 +20,8 @@ DECL VM_TZ       "Europe/Paris"
 DECL VM_MIRROR     "mirror.dsi.uca.fr"
 DECL VM_MIRROR_DIR "/debian/debian/"
 DECL VM_PROXY      "$http_proxy"
+#
+DECL VM_EXTRA_PACKAGES "openssh-server"
 
 # Generate file
 
@@ -114,7 +116,7 @@ d-i pkgsel/install-language-support boolean false
 taskel tasksel/first multiselect standard
 
 # paquets supplémentaires
-d-i pkgsel/include string openssh-server
+d-i pkgsel/include string $VM_EXTRA_PACKAGES
 d-i pkgsel/upgrade select none
 
 # Users

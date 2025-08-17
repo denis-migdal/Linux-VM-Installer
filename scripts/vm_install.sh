@@ -9,6 +9,7 @@ DECL () {
 }
 
 DECL VM_LOGIN zeus
+DECL VM_POSTINSTALL ""
 
 # Preseed (read from input if not given)
 if [[ $2 == "-" ]] ; then
@@ -22,10 +23,12 @@ fi
 if [ ! -v "VM_ISO" ] ; then
 
     tmp_iso=$(mktemp /tmp/debian.XXXXXX.iso)
-
-    wget -O "$tmp_iso" https://cdimage.debian.org/debian-cd/current/amd64/iso-dvd/debian-12.11.0-amd64-DVD-1.iso
-    
     VM_ISO="$tmp_iso"
+
+    OS_VERSION="12.11.0"
+
+    wget -O "$VM_ISO" https://cdimage.debian.org/mirror/cdimage/archive/$OS_VERSION/amd64/iso-dvd/debian-$OS_VERSION-amd64-DVD-1.iso
+    
 fi
 #if [ ! -v "VM_ADDON" ] ; then
 #
@@ -54,7 +57,9 @@ VM_SSH_PUBKEY=$(cat "$DIR"/../assets/keys/LVMI.pub)
 
 POST_INSTALL=$(cat <<- CEOF
 
-    echo "$VM_SSH_PUBKEY" >> /target/home/zeus/.ssh/authorized_keys
+    ls /target/
+    mkdir /target/home/$VM_LOGIN/.ssh
+    echo "$VM_SSH_PUBKEY" >> /target/home/$VM_LOGIN/.ssh/authorized_keys
     
     echo "$VMREADY_SERVICE" > /target/etc/systemd/system/VMReady.service
     ln -s /etc/systemd/system/VMReady.service /target/etc/systemd/system/multi-user.target.wants/VMReady.service
@@ -69,8 +74,12 @@ POST_INSTALL=$(cat <<- CEOF
 
     echo 'http_proxy="$http_proxy"' >> /target/etc/environment
     echo 'https_proxy="$https_proxy"' >> /target/etc/environment
+
+    $VM_POSTINSTALL
 CEOF
 )
+
+echo $POST_INSTALL
 
 # dunno why we need to manually edit /boot/grub/grub.cfg
 
