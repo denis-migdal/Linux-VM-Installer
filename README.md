@@ -7,21 +7,17 @@ https://download.virtualbox.org/virtualbox/
 
 - ...
 
-### TODO
-
-- move postinstall to a file...
-
 ### ASL
 
 
 ```bash
 OS_VERSION="12.11.0"
-VM_ISO_ORIG=/tmp/debian.iso
+VM_ISO_ORIG=/var/tmp/debian.iso
 
 wget -O "$VM_ISO_ORIG" https://cdimage.debian.org/mirror/cdimage/archive/$OS_VERSION/amd64/iso-dvd/debian-$OS_VERSION-amd64-DVD-1.iso
 
 export VM_DEBUG=true
-export VM_ISO=/tmp/debian-patched.iso
+export VM_ISO=/var/tmp/debian-patched.iso
 
 # create & install VM
 ./asl_patchiso.sh "$VM_ISO_ORIG" "$VM_ISO"

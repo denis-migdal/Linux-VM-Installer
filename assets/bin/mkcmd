@@ -1,0 +1,14 @@
+#!/usr/bin/bash
+
+TARGET="$HOME/.local"
+if [[ "$0" == "-g" ]] ; then
+    TARGET="/usr/local"
+    shift
+fi
+
+BINDIR="$LOCAL/bin/"
+
+mkdir -p "$BINDIR"
+
+chmod +x "$0"
+ln "$0" "$BINDIR"
