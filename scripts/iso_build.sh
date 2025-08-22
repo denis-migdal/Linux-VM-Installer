@@ -8,4 +8,4 @@ genisoimage -r -J -b isolinux/isolinux.bin -c isolinux/boot.cat \
 	-no-emul-boot -boot-load-size 4 -boot-info-table \
 	-o "$DST_ISO" "$ISODIR"
 
-isohybrid "$DST_ISO"
+# isohybrid "$DST_ISO"

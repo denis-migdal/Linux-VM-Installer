@@ -7,6 +7,11 @@ https://download.virtualbox.org/virtualbox/
 
 - ...
 
+## TODO
+
+- use archivemount to patch iso file inplace (copy if dst given ?)
+- test avec time
+
 ### ASL
 
 

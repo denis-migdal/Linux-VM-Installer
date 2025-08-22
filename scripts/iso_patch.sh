@@ -6,25 +6,29 @@ DECL () {
   fi
 }
 
-DECL VM_LOGIN zeus
+DECL VM_LOGIN    zeus
+DECL VM_ASSETS  "keys/LVMI.pub VMReady.service"
 
 INSTALL_DIR="$1/install/"
 DIR=$(dirname $(readlink -f $0))
 
-cp "$DIR"/../assets/keys/LVMI.pub   "$INSTALL_DIR"/LVMI.pub
-cp "$DIR"/../assets/vmready.service "$INSTALL_DIR"/vmready.service
+rm -r "$INSTALL_DIR"/*
+
+for ASSET in $VM_ASSETS; do
+    cp -r "$DIR/../assets/$ASSET" -t "$INSTALL_DIR/"
+done
 
 cat <<EOF > "$INSTALL_DIR/postinstall.sh"
 #!/usr/bin/bash
 
 set -x
 
-cp /cdrom/install/postinstall.sh /target/root/postinstall.sh
+cp /cdrom/install/postinstall.sh -t /target/root/
 
 mkdir /target/home/$VM_LOGIN/.ssh
-cp /cdrom/install/LVMI.pub /target/home/$VM_LOGIN/.ssh/authorized_keys
+cp /cdrom/install/LVMI.pub -T /target/home/$VM_LOGIN/.ssh/authorized_keys
 
-cp /cdrom/install/vmready.service /target/etc/systemd/system/VMReady.service
+cp /cdrom/install/VMReady.service -t /target/etc/systemd/system/
 ln -s /etc/systemd/system/VMReady.service /target/etc/systemd/system/multi-user.target.wants/VMReady.service
 
 sed -i 's#GRUB_TIMEOUT=5#GRUB_TIMEOUT=0#' /target/etc/default/grub

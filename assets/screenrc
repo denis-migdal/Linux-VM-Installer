@@ -1,0 +1,33 @@
+# active le support de la souris
+#mousetrack on
+#defmousetrack on
+
+# changer de région avec crtl + flèches.
+bindkey "^[[1;5C" focus right
+bindkey "^[[1;5D" focus left 
+bindkey "^[[1;5A" focus up
+bindkey "^[[1;5B" focus down
+
+# Les raccourcits claviers F2 à F9.
+bindkey -k k2 screen
+bindkey -k k3 title
+bindkey -k k4 windowlist
+bindkey -k k5 copy
+
+bindkey -k k6 split -v
+bindkey -k k7 split
+bindkey -k k8 remove
+bindkey -k k9 detach
+
+# Le format de la barre de status globale
+hardstatus alwayslastline
+hardstatus string "%{.wk}F2: new F3: rename F4: select F5: copy mode F6/F7: split F8: remove F9: quit %=%{..R}%{.kw} %1` %{..G} %H %{..Y} %Y/%m/%d %c"
+backtick 1 1 1 /bin/bash -c 'cpuLoad=$(cut -s -d\  -f12 <(uptime)); cpuLoad=${cpuLoad:0:-1}; memLoad=$(free -g | grep Mem | awk '\''{print $3"/"$2" GB"}'\''); echo "CPU: ${cpuLoad} Mem: ${memLoad}" '
+
+
+# Le format de la barre de status de chaque région.
+caption always
+caption string "%{.kW}%-w%{.bW}%t [%n]%{-}%+w %= %{..R}"
+
+# Sauvergarder la disposition des régions.
+layout save default

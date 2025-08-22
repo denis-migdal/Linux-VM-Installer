@@ -2,26 +2,28 @@
 
 VM_ISO_SRC="$1"
 VM_ISO_DST="$2"
-DIR=$(dirname $(readlink -f $0))
 
+#ISODIR=$(mktemp -d)
 ISODIR="/var/tmp/debian.iso.d"
 mkdir "$ISODIR"
-#ISODIR=$(mktemp -d )
 
+export VM_ASSETS="screenrc bin lsd.yaml keys/LVMI.pub VMReady.service"
+
+DIR=$(dirname $(readlink -f $0))
 "$DIR"/scripts/iso_extract.sh "$VM_ISO_SRC" "$ISODIR"
 "$DIR"/scripts/iso_patch.sh "$ISODIR"
 
-cp "$DIR"/assets/lsd.yaml "$ISODIR/install/lsd.yaml"
-cp -r "$DIR"/assets/bin "$ISODIR/install/"
-
 cat << EOF >> "$ISODIR/install/postinstall.sh"
+
+# screenrc
+cp /cdrom/install/screenrc -t /target/etc/
 
 # lsd
 mkdir /target/etc/lsd
-cp /cdrom/install/lsd.yaml /target/etc/lsd/config.yaml
+cp /cdrom/install/lsd.yaml -T /target/etc/lsd/config.yaml
 
 # cmd
-cp /cdrom/install/bin/* /target/usr/local/bin/
+cp /cdrom/install/bin/* -t /target/usr/local/bin/
 chmod +x /target/usr/local/bin/*
 
 chroot /target /bin/bash -c '
